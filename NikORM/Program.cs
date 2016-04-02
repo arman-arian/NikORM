@@ -199,7 +199,7 @@ namespace NikORM
             var query = string.Format(distinct ? "SELECT DISTINCT {0} {1} FROM {2}" : "SELECT {0} {1} FROM {2}", top, "*", tableName);
             return new SelectFromResult<T>(query);
         }
-    }
+    } 
 
     public class DbSet<T>
     {
