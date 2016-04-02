@@ -307,6 +307,14 @@ namespace NikORM
 
         public static IReadOnlyList<string> GetArguments<T>(this Expression<Func<T, object>> expression)
         {
+            //Select *
+            if (expression.Body.Type == typeof(T))
+            {
+                return typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    .Select(propertyInfo => propertyInfo.Name)
+                    .ToList();
+            }
+
             return new ReferencedPropertyFinder().GetArguments(expression).ToList();
         }
     }
