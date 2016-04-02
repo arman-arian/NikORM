@@ -90,35 +90,7 @@ namespace NikORM
         }
     }
 
-    public class SelectFromResult<T>
-    {
-        private readonly string _query;
 
-        public SelectFromResult(string query)
-        {
-            _query = query;
-        }
-
-        public WhereResult<T> Where(Expression<Func<T, bool>> exp)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<T> Load(int count = -1)
-        {
-            if (count != -1)
-            {
-                var query = string.Format("SELECT TOP {0} * FROM ({1}) T", count, _query);
-            }
-
-            throw new NotImplementedException();
-        }
-
-        public JoinResult<TDes> Join<TDes>(Expression<Func<T, object>> src, Expression<Func<TDes, object>> des)
-        {
-            throw new NotImplementedException(); 
-        }
-    }
 
     public class JoinResult<TDes>
     {
@@ -175,6 +147,57 @@ namespace NikORM
             return new SelectFromResult<T>(query);
         }
     }
+
+    public class SelectFromResult<T> : IDisposable
+    {
+        private readonly string _query;
+
+        public SelectFromResult(string query)
+        {
+            _query = query;
+        }
+
+        public WhereResult<T> Where(Expression<Func<T, bool>> exp)
+        {
+            throw new NotImplementedException();
+        }
+
+        public JoinResult<TDes> Join<TDes>(Expression<Func<T, object>> src, Expression<Func<TDes, object>> des)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<T> Load(int count = -1)
+        {
+            if (count != -1)
+            {
+                var query = string.Format("SELECT TOP {0} * FROM ({1}) T", count, _query);
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public void Dispose()
+        {
+            
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public static class NikHelpers
     {
