@@ -13,7 +13,7 @@ namespace NikORM
             var ctx = new  TestContext();
             var y = ctx.SelectFrom<Account>(a => a);
 
-            ctx.SelectFrom<Account>(distinct: true);
+            ctx.SelectFrom<Account>(a => a);
 
             ctx.SelectFrom<Account>(1, a => a.Id).Load();
 
