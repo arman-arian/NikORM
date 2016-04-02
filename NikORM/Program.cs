@@ -11,7 +11,7 @@ namespace NikORM
         static void Main(string[] args)
         {
             var ctx = new  TestContext();
-            var y = ctx.SelectFrom<Account>(a => a);
+            var y = ctx.SelectFrom<Account>(a => a).Where(a => a.Balance == 0 && a.Id == 1);
 
             ctx.SelectFrom<Account>(a => a);
 
@@ -159,6 +159,8 @@ namespace NikORM
 
         public WhereResult<T> Where(Expression<Func<T, bool>> exp)
         {
+            var qstr = exp.ToString();
+
             throw new NotImplementedException();
         }
 
