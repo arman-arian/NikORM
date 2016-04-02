@@ -142,64 +142,54 @@ namespace NikORM
     {
         public SelectFromResult<T> SelectFrom<T>(Expression<Func<T, object>> expression)
         {
-            var cols = expression.GetArguments().ToDelimString();
-            var tableName = typeof (T).Name;
-            var query = string.Format("SELECT {0} FROM {1}", cols, tableName);
-            return new SelectFromResult<T>(query);
+            return SelectFrom<T>(false, 0, expression);
         }
 
         public SelectFromResult<T> SelectFrom<T>(bool distinct, Expression<Func<T, object>> expression)
         {
-            var cols = expression.GetArguments().ToDelimString();
-            var tableName = typeof(T).Name;
-            var query = string.Format(distinct ? "SELECT DISTINCT {0} FROM {1}" : "SELECT {0} FROM {1}", cols, tableName);
-            return new SelectFromResult<T>(query);
+            return SelectFrom<T>(distinct, 0, expression);
         }
 
         public SelectFromResult<T> SelectFrom<T>(uint top, Expression<Func<T, object>> expression)
         {
-            var cols = expression.GetArguments().ToDelimString();
-            var tableName = typeof(T).Name;
-            var query = string.Format("SELECT {0} {1} FROM {2}", top, cols, tableName);
-            return new SelectFromResult<T>(query);
+            return SelectFrom<T>(false, top, expression);
         }
 
         public SelectFromResult<T> SelectFrom<T>(bool distinct, uint top, Expression<Func<T, object>> expression)
         {
-            var cols = expression.GetArguments().ToDelimString();
-            var tableName = typeof(T).Name;
-            var query = string.Format(distinct ? "SELECT DISTINCT {0} {1} FROM {2}" : "SELECT {0} {1} FROM {2}", top, cols, tableName);
+            var cols = NikHelpers.GetColumnsName(expression);
+            var tableName = NikHelpers.GetTableName<T>();
+
+            var query = "SELECT ";
+
+            if (distinct)
+                query += "DISTINCT ";
+
+            if (top > 0)
+                query += string.Format("TOP {0} ", top);
+
+            query += string.Format("{0} ", cols);
+
+            query += string.Format("FROM {0}", tableName);
+
             return new SelectFromResult<T>(query);
+        }
+    }
+
+    public static class NikHelpers
+    {
+        public static string GetColumnsName<T>(Expression<Func<T, object>> expression)
+        {
+            return expression.GetArguments().ToDelimString();
         }
 
-        public SelectFromResult<T> SelectFrom<T>()
+        public static string GetTableName<T>()
         {
-            var tableName = typeof(T).Name;
-            var query = string.Format("SELECT {0} FROM {1}", "*", tableName);
-            return new SelectFromResult<T>(query);
+            return typeof(T).Name;
         }
 
-        public SelectFromResult<T> SelectFrom<T>(uint top)
-        {
-            var tableName = typeof(T).Name;
-            var query = string.Format("SELECT TOP {0} {1} FROM {2}", top, "*", tableName);
-            return new SelectFromResult<T>(query);
-        }
+    }
 
-        public SelectFromResult<T> SelectFrom<T>(bool distinct)
-        {
-            var tableName = typeof(T).Name;
-            var query = string.Format(distinct ? "SELECT DISTINCT {0} FROM {1}" : "SELECT {0} FROM {1}", "*", tableName);
-            return new SelectFromResult<T>(query);
-        }
-
-        public SelectFromResult<T> SelectFrom<T>(bool distinct, uint top)
-        {
-            var tableName = typeof(T).Name;
-            var query = string.Format(distinct ? "SELECT DISTINCT {0} {1} FROM {2}" : "SELECT {0} {1} FROM {2}", top, "*", tableName);
-            return new SelectFromResult<T>(query);
-        }
-    } 
 
     public class DbSet<T>
     {
