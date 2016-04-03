@@ -10,6 +10,12 @@ namespace NikORM
     {
         static void Main(string[] args)
         {
+
+            Expression<Func<Account, object>> expression = a => new {Ad = SqlFunc.Max(a.Id), a.Id};
+
+            var xdd = expression.GetArguments();
+
+
             var ctx = new  TestContext();
             var y = ctx.SelectFrom<Account>(a => a).Where(a => a.Balance == 0 && a.Id == 1);
 
@@ -96,7 +102,7 @@ namespace NikORM
     {
         public SelectFromResult<TDes> SelectFrom<T>(Expression<Func<TDes, object>> expression)
         {
-            var xxx = expression.GetArguments().ToDelimString();
+            var xxx = expression.GetArguments();
             //var query = $"select {xxx} from {typeof (T).Name}";
             throw new NotImplementedException();
         }
@@ -205,7 +211,7 @@ namespace NikORM
     {
         public static string GetColumnsName<T>(Expression<Func<T, object>> expression)
         {
-            return expression.GetArguments().ToDelimString();
+            return expression.GetArguments();
         }
 
         public static string GetTableName<T>()
@@ -259,35 +265,7 @@ namespace NikORM
         
     }
 
-    internal sealed class ReferencedPropertyFinder : ExpressionVisitor
-    {
-        private Type _ownerType;
-        private readonly List<string> _properties;
 
-        public ReferencedPropertyFinder()
-        {
-            _properties = new List<string>();
-        }
-
-        public IReadOnlyList<string> GetArguments<T, U>(Expression<Func<T, U>> expression)
-        {
-            _properties.Clear();
-            _ownerType = typeof(T);
-
-            Visit(expression);
-            return _properties;
-        }
-
-        protected override Expression VisitMember(MemberExpression node)
-        {
-            var propertyInfo = node.Member as PropertyInfo;
-            if (propertyInfo != null && _ownerType.IsAssignableFrom(propertyInfo.DeclaringType))
-            {
-                _properties.Add(propertyInfo.Name);
-            }
-            return base.VisitMember(node);
-        }
-    }
 
     public static class Ex
     {
@@ -307,17 +285,25 @@ namespace NikORM
             return ans;
         }
 
-        public static IReadOnlyList<string> GetArguments<T>(this Expression<Func<T, object>> expression)
+        public static string ToDelimString(this IReadOnlyCollection<string> arr, string delim = ",")
         {
-            //Select *
-            if (expression.Body.Type == typeof(T))
+            var ans = "";
+            var Enum = arr.GetEnumerator();
+            Enum.MoveNext();
+            while (Enum.Current != null)
             {
-                return typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                    .Select(propertyInfo => propertyInfo.Name)
-                    .ToList();
+                ans += Enum.Current;
+                if (Enum.MoveNext())
+                    ans += delim;
+                else
+                    break;
             }
+            return ans;
+        }
 
-            return new ReferencedPropertyFinder().GetArguments(expression).ToList();
+        public static string GetArguments<T>(this Expression<Func<T, object>> expression)
+        {
+            return new SelectExpressionParser().GetArguments(expression);
         }
     }
 
