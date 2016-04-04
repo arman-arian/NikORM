@@ -11,6 +11,11 @@ namespace NikORM
         static void Main(string[] args)
         {
 
+            var xd = new Query<Account>().SelectFrom(a => new {a.Balance, a.Id});
+
+
+            
+
             Expression<Func<Account, object>> expression = a => new {Ad = SqlFunc.Max(a.Id), a.Id};
 
             var xdd = expression.GetArguments();
@@ -123,6 +128,15 @@ namespace NikORM
             return SelectFrom<T>(false, 0, expression);
         }
 
+        private static TResult A<TSource, TResult>(TSource source, Func<TSource, TResult> expr) where TSource : new()
+        {
+            var obj = new TSource();
+            var property = typeof(TSource).GetProperty("Id");
+            property.SetValue(obj, 1, null);
+            return expr(obj);
+        }
+
+
         public SelectFromResult<T> SelectFrom<T>(bool distinct, Expression<Func<T, object>> expression)
         {
             return SelectFrom<T>(distinct, 0, expression);
@@ -153,6 +167,18 @@ namespace NikORM
             return new SelectFromResult<T>(query);
         }
     }
+
+    public class Query<TSource> where TSource : new()
+    {
+        public TResult SelectFrom<TResult>(Func<TSource, TResult> expr) 
+        {
+            var obj = new TSource();
+            var property = typeof(TSource).GetProperty("Id");
+            property.SetValue(obj, 1, null);
+            return expr(obj);
+        }
+    }
+
 
     public class SelectFromResult<T> : IDisposable
     {
@@ -189,6 +215,30 @@ namespace NikORM
         {
             
         }
+
+        //class Program
+        //{
+        //    static void Main(string[] args)
+        //    {
+        //        var v1 = new { Amount = 108, Message = "Hello" };
+
+        //        var v2 = new[] { new { name = "apple", diam = 4 }, new { name = "grape", diam = 1 } };
+
+        //        Expression<Func<Account, object>> expr = a => new { a.Id, B = a.Balance };
+
+        //        var t = A(new Account(), a => new { a.Id, B = SqlFunc.Avg(a.Balance) });
+
+        //        var id = t.Id;
+        //    }
+
+        //    private static TResult A<TSource, TResult>(TSource source, Func<TSource, TResult> expr) where TSource : new()
+        //    {
+        //        var obj = new TSource();
+        //        var property = typeof(TSource).GetProperty("Id");
+        //        property.SetValue(obj, 1, null);
+        //        return expr(obj);
+        //    }
+        //}
     }
 
 
