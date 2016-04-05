@@ -11,7 +11,9 @@ namespace NikORM
         static void Main(string[] args)
         {
 
-            var xd = new Query<Account>().Select(false, 1, a => new {a.Balance, a.Id}).Where(a => a.Balance == 0);
+            var xd = new Query<Account>()
+                .Select(a => new {a.Balance, a.Id})
+                .Where(a => a.Balance == 0);
 
 
             
@@ -28,7 +30,7 @@ namespace NikORM
 
             new Query<Account>().Select(1, a => a.Id).Load();
 
-            var df = new Query<Account>().Select(a => a.Balance).Load(10);
+            var df = new Query<Account>().Select(a => a.Balance).Load();
 
             new Query<Account>().Select(x => new {x.Balance, x.Id})
                 .Where(a => a.Balance == 1000)
@@ -67,6 +69,8 @@ namespace NikORM
     {
         public DbSet<Account> Accounts { get; set; } 
     }
+
+
 
 
     public class DbContext
@@ -131,7 +135,7 @@ namespace NikORM
             throw new NotImplementedException();
         }
 
-        public List<TSource> Load(int count = -1)
+        public List<TSource> Load()
         {
             throw new NotImplementedException();
         }
