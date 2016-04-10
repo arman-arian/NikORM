@@ -43,7 +43,7 @@ namespace NikORM
                 .Join<Customer>(a => a.Id, c => c.AccountId)
                 .Select(a => a.Portion)
                 .Load();
-
+             
             //ctx.SelectFrom<Account>(x => new { x.Balance, x.Id }).Max(x => x.Balance);
 
         }
